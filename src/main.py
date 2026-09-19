@@ -1,7 +1,7 @@
 import flet as ft
 from app_state import AppState
 from home import Home
-from profile import Profile
+from user_profile import Profile
 
 # 전역 상태 인스턴스 생성
 global_state = AppState()
@@ -18,9 +18,9 @@ def App(state: AppState):
                 ft.Router(
                     [
                         ft.Route(index=True, component=lambda: Home(state=state)),
-                        ft.Route(index="profile", component=lambda: Home(state=state)),
+                        ft.Route(path="/profile", component=lambda: Profile(state=state)),
                     ]
-                ),
+                )
             ]
         )
     )
@@ -36,8 +36,13 @@ def main(page: ft.Page):
     page.appbar = ft.AppBar(
         title=ft.Text("My Week"),
         bgcolor="#ffbb00",
-        actions=[ft.IconButton(ft.Icons.HOME, on_click=lambda e: ft.context.page.navigate("/")), ft.IconButton(ft.Icons.PERSON_2_OUTLINED, on_click=lambda e: ft.context.page.navigate("/profile")), ft.IconButton(ft.Icons.SHOPPING_CART,  on_click=lambda e: ft.context.page.navigate("/cart")), ft.IconButton(ft.Icons.PAYMENT,on_click=lambda e: ft.context.page.navigate("/pay"))],
-        )
+        actions=[
+            ft.IconButton(ft.Icons.HOME, on_click=lambda e: page.navigate("/")),
+            ft.IconButton(ft.Icons.PERSON_2_OUTLINED, on_click=lambda e: page.navigate("/profile")),
+            ft.IconButton(ft.Icons.SHOPPING_CART, on_click=lambda e: page.navigate("/cart")),
+            ft.IconButton(ft.Icons.PAYMENT, on_click=lambda e: page.navigate("/pay")),
+        ],
+    )
     page.render(MainApp) 
 
 

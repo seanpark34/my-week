@@ -19,6 +19,7 @@ env/
 .flet/
 build/
 storage/
+dist/
 
 # IDE
 .idea/

@@ -9,6 +9,23 @@ def Profile(state: AppState, page: ft.Page):
                 ft.Button("로그인", on_click=lambda e: page.navigate("/log_in"), bgcolor="#60FA41"),
             ]
         )
+
+    show_nickname_input, set_show_nickname_input = ft.use_state(False)
+    nickname, set_nickname = ft.use_state(state.nickname)
+    
+    def update_nickname(e):
+        set_nickname(e.control.value or "")
+
+    def save_nickname(_):
+        new_nickname = nickname.strip()
+        if new_nickname:
+            state.save_nickname(new_nickname)
+            page.show_dialog(ft.SnackBar(ft.Text(f"닉네임이 저장되었습니다: {new_nickname}")))
+        page.navigate("/profile")
+
+    def log_out(_):
+        state.login_done = 0
+        page.navigate("/log_in")
     
     icons = {
         "루키(1/16)": ft.Icons.EMOJI_EVENTS, "스톤(2/16)": ft.Icons.EMOJI_EVENTS,
@@ -29,32 +46,9 @@ def Profile(state: AppState, page: ft.Page):
         "펄(13/16)": "#f9a9f9", "다이아몬드(14/16)" : "#a9eaf9", "계획 마스터(15/16)": "#e0a4f9", "계획 왕(16/16)": "#ffe600",
     }
 
-    levels = {
-        0: "루키(1/16)", 1: "스톤(2/16)", 2: "핑크(3/16)", 3: "오렌지(4/16)", 4: "브론즈(5/16)",
-        5: "실버(6/16)", 6: "실버(6/16)", 7: "골드(7/16)", 8: "골드(7/16)", 9: "골드(7/16)",
-        **dict.fromkeys(range(10, 15), "플래티넘(8/16)"),
-        **dict.fromkeys(range(15, 20), "사파이어(9/16)"),
-        **dict.fromkeys(range(20, 25), "루비(10/16)"),
-        **dict.fromkeys(range(25, 30), "에메랄드(11/16)"),
-        **dict.fromkeys(range(30, 35), "자수정(12/16)"),
-        **dict.fromkeys(range(35, 40), "펄(13/16)"),
-        **dict.fromkeys(range(40, 45), "다이아몬드(14/16)"),
-        **dict.fromkeys(range(45, 52), "계획 마스터(15/16)"),
-        **dict.fromkeys(range(52, 10000), "계획 왕(16/16)"),
-    }
-
     nickname = state.nickname
-    profile_color = "#000000" if levels.get(state.week, "루키(1/16)") == "루키(1/16)" else colors.get(levels.get(state.week, "루키(1/16)"), "#000000")
-
-    def week_plus(_):
-            state.week += 1
-
-            
-    def week_minus(_):
-        if state.week > 0:
-            state.week -= 1
-
-    level = levels.get(state.week, "루키(1/16)")
+    profile_color = "#000000" if state.levels.get(state.week, "루키(1/16)") == "루키(1/16)" else colors.get(state.levels.get(state.week, "루키(1/16)"), "#000000")
+    level = state.levels.get(state.week, "루키(1/16)")
     color = colors[level]
     icon = icons[level]
 
@@ -64,17 +58,11 @@ def Profile(state: AppState, page: ft.Page):
                     controls=[
                         ft.Icon(ft.Icons.ACCOUNT_CIRCLE, size=30, color=profile_color), 
                         ft.Text(nickname, size=20),
-                        ft.Button("닉네임 변경", on_click=lambda e: page.navigate("/settings"), bgcolor="#60FA41"),
                     ]
                 ),
+                ft.Button("닉네임 변경", bgcolor="#60FA41", on_click=lambda e: page.navigate("/settings")),
                 ft.Text(f"Week {state.week}", size=20),
                 ft.Text(level, size=30),
                 ft.Icon(icon, color=color, size=100),
-                ft.Row(
-                    controls=[
-                        ft.IconButton(ft.Icons.EXPOSURE_PLUS_1_ROUNDED, on_click=week_plus),
-                        ft.IconButton(ft.Icons.EXPOSURE_MINUS_1_ROUNDED, on_click=week_minus),
-                    ]
-                )
             ]
     )

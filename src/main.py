@@ -3,11 +3,12 @@ from app_state import AppState
 from home_view import Home
 from user_profile import Profile
 from calendar_view import Calendar
-from app_settings import Settings
 from add_plan import Plans
 from one_week_plan import Week_Plan
 from plan_progress import progress
 from log_in import LogIn
+from app_guide import Guide
+from app_settings import Settings
 
 @ft.component
 def App(state: AppState, page: ft.Page):
@@ -20,14 +21,15 @@ def App(state: AppState, page: ft.Page):
                         ft.Route(index=True, component=lambda: Home(state=state, page=page)),
                         ft.Route(path="/profile", component=lambda: Profile(state=state, page=page)),
                         ft.Route(path="/calendar", component=lambda: Calendar(state=state, page=page)),
-                        ft.Route(path="/settings", component=lambda: Settings(state=state, page=page)),
+                        ft.Route(path="/guide", component=lambda: Guide(state=state, page=page)),
                         ft.Route(
                             path="/add_plan/:week_key", 
                             component=lambda: Plans(state=state, page=page),
                         ),
                         ft.Route(path="/week_plan/:week_key", component=lambda: Week_Plan(state=state, page=page)),
                         ft.Route(path="/progress/:week_key/:plan_num", component=lambda: progress(state=state, page=page)),
-                        ft.Route(path="/log_in", component=lambda: LogIn(state=state, page=page))
+                        ft.Route(path="/log_in", component=lambda: LogIn(state=state, page=page)),
+                        ft.Route(path="/settings", component=lambda: Settings(state=state, page=page))
                     ]
                 )
             ]
@@ -53,7 +55,7 @@ async def main(page: ft.Page):
         actions=[
             ft.IconButton(ft.Icons.PERSON_2_OUTLINED, on_click=lambda e: page.navigate("/profile")),
             ft.IconButton(ft.Icons.CALENDAR_MONTH, on_click=lambda e: page.navigate("/calendar")),
-            ft.IconButton(ft.Icons.SETTINGS, on_click=lambda e: page.navigate("/settings")),
+            ft.IconButton(ft.Icons.QUESTION_MARK_ROUNDED, on_click=lambda e: page.navigate("/guide")),
         ],
     )
     page.render(lambda: MainApp(state=global_state, page=page))

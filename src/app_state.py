@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field, fields, asdict
 import json
 import flet as ft
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 STORAGE_KEY = "my_week_"
 
@@ -27,8 +27,21 @@ class AppState():
     plans: dict = field(default_factory=dict)
     _week: int = 0 # 연속 진행한 주차 수
     _list_num : int = 1 # 계획에 부여할 고유 번호
-    _last_prize: int = 20261004
-    _need_to_update: int = 0
+    last_login: date = date.today() # 마지막 로그인 날짜의 다음주 일요일 날짜
+
+    levels = {
+        0: "루키(1/16)", 1: "스톤(2/16)", 2: "핑크(3/16)", 3: "오렌지(4/16)", 4: "브론즈(5/16)",
+        5: "실버(6/16)", 6: "실버(6/16)", 7: "골드(7/16)", 8: "골드(7/16)", 9: "골드(7/16)",
+        **dict.fromkeys(range(10, 15), "플래티넘(8/16)"),
+        **dict.fromkeys(range(15, 20), "사파이어(9/16)"),
+        **dict.fromkeys(range(20, 25), "루비(10/16)"),
+        **dict.fromkeys(range(25, 30), "에메랄드(11/16)"),
+        **dict.fromkeys(range(30, 35), "자수정(12/16)"),
+        **dict.fromkeys(range(35, 40), "펄(13/16)"),
+        **dict.fromkeys(range(40, 45), "다이아몬드(14/16)"),
+        **dict.fromkeys(range(45, 52), "계획 마스터(15/16)"),
+        **dict.fromkeys(range(52, 10000), "계획 왕(16/16)"),
+    }
 
     @property
     def is_logged_in(self) -> bool:
@@ -82,8 +95,7 @@ class AppState():
             saved_plans = await self.prefs.get(f"{STORAGE_KEY}_{self.current_user_id}_plans")
             saved_week = await self.prefs.get(f"{STORAGE_KEY}_{self.current_user_id}_week")
             saved_list_num = await self.prefs.get(f"{STORAGE_KEY}_{self.current_user_id}_list_num")
-            saved_last_prize = await self.prefs.get(f"{STORAGE_KEY}_{self.current_user_id}_last_prize")
-            saved_need_to_update = await self.prefs.get(f"{STORAGE_KEY}_{self.current_user_id}_need_to_update")
+            saved_last_login = await self.prefs.get(f"{STORAGE_KEY}_{self.current_user_id}_last_login")
 
             if saved_nickname is not None:
                 self.nickname = saved_nickname
@@ -95,10 +107,8 @@ class AppState():
                 self._week = int(saved_week)
             if saved_list_num is not None:
                 self._list_num = int(saved_list_num)
-            if saved_last_prize is not None:
-                self._last_prize = int(saved_last_prize)
-            if saved_need_to_update is not None:
-                self._need_to_update = int(saved_need_to_update)
+            if saved_last_login is not None:
+                self.last_login = date.strptime(saved_last_login, "%Y%m%d%H")
 
     def set_logged_in(self, user):
         self.current_user_id = user["id"]
@@ -129,6 +139,11 @@ class AppState():
             print(f"saving plans", self.plans)
             self.page.run_task(self._save_user_data_async, "plans", json.dumps(self.plans))
 
+    def save_last_login(self):
+        today = datetime.now()
+        print("saving last login time")
+        self.page.run_task(self._save_user_data_async, "last_login", today.strftime("%Y%m%d%H"))
+    
     # 비동기 저장용 내부 도우미 함수
     async def _save_users_async(self, value: list):
         print(f"Saving users: {value}")
@@ -139,7 +154,7 @@ class AppState():
         await self.prefs.set(f"{STORAGE_KEY}_{self.current_user_id}_{key}", value)
 
 
-    def plans_for_selected_week(self, week_key) -> list:
+    def plans_for_selected_week(self, week_key: str) -> list:
         plans_of_the_week = self.plans.get(week_key)
         if plans_of_the_week is None:
             self.plans[week_key] = []

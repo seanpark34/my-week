@@ -1,7 +1,8 @@
 import flet as ft
 from app_state import AppState
 from flet import CupertinoIcons
-
+from datetime import timedelta, datetime
+import asyncio
 
 def _register_user(state: AppState, username: str, password: str, confirmation: str) -> str | None:
     if not username or not password:
@@ -38,6 +39,9 @@ async def _authenticate_user(state: AppState, username: str, password: str) -> s
     await state.load_user_data()
     return None
 
+today = datetime.now()
+day_num = (today.weekday()+1) % 7
+last_week_key = today - timedelta(day_num + 7)
 
 @ft.component
 def LogIn(state: AppState, page: ft.Page):
@@ -48,20 +52,53 @@ def LogIn(state: AppState, page: ft.Page):
     confirm_password_value, set_confirm_password_value = ft.use_state("")
     error_message, set_error_message = ft.use_state("")
 
+    trophie_level_up = [1, 2, 3, 4, 5, 7, 10, 15, 20, 25, 30, 35, 40, 45, 52]
+
+    async def check_prize():
+        selected_week_plans = state.plans_for_selected_week(last_week_key.strftime("%Y%m%d"))
+        total_plan_types = len(selected_week_plans)
+        completed_plan_types = sum(
+            1
+            for plan in selected_week_plans
+            if plan.get("Done", 0) >= plan["how_much"]
+            )
+        this_week_progress_value = (
+            completed_plan_types / total_plan_types if total_plan_types else 0
+        )
+        last_login_day = state.last_login.weekday()
+        need_to_add = 6-last_login_day
+        next_week_sunday = state.last_login + timedelta(need_to_add)
+        if state.last_login < next_week_sunday:
+                if this_week_progress_value == 1:    
+                    state.week += 1
+                    page.show_dialog(ft.SnackBar(ft.Text(f"지난주 할 일을 모두 완료했어요! {state.week}주 완료")))
+                    if state.week in trophie_level_up:
+                        await asyncio.sleep(3)
+                        page.show_dialog(ft.SnackBar(ft.Text(f"{state.levels[state.week]} 트로피를 획득했어요!")))
+
+
     async def handle_login(_):
         username = username_value.strip()
         if is_signup:
             error = _register_user(
                 state, username, password_value, confirm_password_value
             )
+            if error:
+                set_error_message(error)
+                return
+            set_error_message("")
+            page.run_task(check_prize)
+            state.save_last_login()
+            page.navigate("/guide")
         else:
             error = await _authenticate_user(state, username, password_value)
-
-        if error:
-            set_error_message(error)
-            return
-        set_error_message("")
-        page.navigate("/calendar")
+            if error:
+                set_error_message(error)
+                return
+            set_error_message("")
+            page.run_task(check_prize)
+            state.save_last_login()
+            page.navigate("/calendar")
 
     def toggle_password(_):
         set_password(not password)
@@ -132,5 +169,6 @@ def LogIn(state: AppState, page: ft.Page):
                 "이미 계정이 있어요. 로그인" if is_signup else "계정이 없으신가요? 회원가입",
                 on_click=toggle_mode,
             ),
+            ft.Text("⚠️아이디와 비밀번호는 이 기기에만 저장됩니다.", size=20, color="#B42318")
         ]
     )

@@ -42,6 +42,8 @@ def Week_Plan(state:AppState, page):
         completed_plan_types / total_plan_types if total_plan_types else 0
     )
 
+    
+
     def go_to_add_plan():
         page.navigate(f"/add_plan/{week_key}")
 

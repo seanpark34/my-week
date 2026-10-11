@@ -1,4 +1,4 @@
-from arrow import now
+# from arrow import now
 import flet as ft
 from app_state import AppState
 from datetime import datetime, timedelta
@@ -39,6 +39,7 @@ def Calendar(state: AppState, page: ft.Page):
     today = datetime.now()
     day_num = today.weekday()+1
     month = today.strftime("%m")
+    month_str = today.strftime("%b")
 
     if day_num == 7:
         day_num = 0
@@ -98,12 +99,12 @@ def Calendar(state: AppState, page: ft.Page):
         ]
 
     weeks = [
-        ft.Row(controls=generate_week(offset)) for offset in range(-1, 3)
+        ft.Row(controls=generate_week(offset)) for offset in range(-1, 2)
     ]
 
     return ft.Column(
         controls=[
-            ft.Text(str(month), size=50, color=month_color[int(month)]),
+            ft.Text(str(month + " " + month_str), size=50, color=month_color[int(month)]),
             ft.Row(
                 controls=[
                     ft.Text("Sun", expand=1, color=day_color[7], text_align=ft.TextAlign.CENTER, size=10),

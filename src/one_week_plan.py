@@ -60,9 +60,9 @@ def Week_Plan(state:AppState, page):
         controls=[
             ft.Row(
                 controls=[
-                    ft.Text(str(week_start_m) + "/" + str(week_start_d) + "~" + str(week_end_m) + "/" + str(week_end_d), size=50),
+                    ft.Text(str(week_start_m) + "/" + str(week_start_d) + "~" + str(week_end_m) + "/" + str(week_end_d), size=30),
                     (
-                        ft.IconButton(ft.Icons.ADD_CIRCLE, on_click=lambda _: go_to_add_plan(), icon_size=50)
+                        ft.IconButton(ft.Icons.ADD_CIRCLE, on_click=lambda _: go_to_add_plan(), icon_size=30)
                         if week_key >= current_week_key 
                         else ft.Text("")
                     )

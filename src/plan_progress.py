@@ -39,15 +39,15 @@ def progress(state=AppState, page=ft.Page):
 
     return ft.Column(
         controls=[
-            ft.Text(f"{chosen_plan['name']} :", size=50),
-            ft.Text(f"{chosen_plan['Done']}{chosen_plan['unit']}/{chosen_plan['how_much']}{chosen_plan['unit']} 완료", size=50),
-            ft.Text(f"{done_count}/{chosen_plan['how_much']}", size=100),
+            ft.Text(f"{chosen_plan['name']} :", size=30),
+            ft.Text(f"{chosen_plan['Done']}{chosen_plan['unit']}/{chosen_plan['how_much']}{chosen_plan['unit']} 완료", size=30),
+            ft.Text(f"{done_count}/{chosen_plan['how_much']}", size=30),
             ft.Row(
                 controls=[    
                     ft.IconButton(
-                        ft.Icons.ADD_CIRCLE, on_click=add_one_done, icon_size=50),
+                        ft.Icons.ADD_CIRCLE, on_click=add_one_done, icon_size=30),
                     ft.IconButton(
-                        ft.Icons.REMOVE_CIRCLE, on_click=remove_one_done, icon_size=50),
+                        ft.Icons.REMOVE_CIRCLE, on_click=remove_one_done, icon_size=30),
                 ]
             ),
             ft.Row(

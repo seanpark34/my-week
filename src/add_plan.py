@@ -105,12 +105,21 @@ def Plans(state: AppState, page: ft.Page):
         wrap=True,
     )
 
+    
+    week_start = datetime.strptime(week_key, "%Y%m%d")
+    week_start_m = week_start.strftime("%m")
+    week_start_d = week_start.strftime("%d")
+    week_end = week_start + timedelta(6)
+    week_end_m = week_end.strftime("%m")
+    week_end_d = week_end.strftime("%d")
+
     return ft.Column(
         controls=[
+            ft.Text(str(week_start_m) + "/" + str(week_start_d) + "~" + str(week_end_m) + "/" + str(week_end_d) + "에 계획 추가", size=20),
             ft.Button("돌아가기", bgcolor="#8FFF3A", on_click=lambda _: page.navigate(f"/week_plan/{week_key}")),
             ft.Row(
                 controls=[
-                    ft.Text("문제집", expand=1, size=30, text_align=ft.TextAlign.CENTER),
+                    ft.Text("문제집", expand=1, size=20, text_align=ft.TextAlign.CENTER),
                     ft.Button("수학", expand=1, on_click=lambda _: append_plan("수학 문제집 풀기")),
                     ft.Button("국어", expand=1, on_click=lambda _: append_plan("국어 문제집 풀기")),
                     ft.Button("영어", expand=1, on_click=lambda _: append_plan("영어 문제집 풀기")),
@@ -120,7 +129,7 @@ def Plans(state: AppState, page: ft.Page):
             ),
             ft.Row(
                 controls=[
-                    ft.Text("책", expand=1, size=30, text_align=ft.TextAlign.CENTER),
+                    ft.Text("책", expand=1, size=20, text_align=ft.TextAlign.CENTER),
                     ft.Button("한글", expand=1, on_click=lambda _: append_plan("한글책 읽기")),
                     ft.Button("영어", expand=1, on_click=lambda _: append_plan("영어책 읽기")),
                     ft.Text("", expand=3),

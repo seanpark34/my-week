@@ -9,23 +9,6 @@ def Profile(state: AppState, page: ft.Page):
                 ft.Button("로그인", on_click=lambda e: page.navigate("/log_in"), bgcolor="#60FA41"),
             ]
         )
-
-    show_nickname_input, set_show_nickname_input = ft.use_state(False)
-    nickname, set_nickname = ft.use_state(state.nickname)
-    
-    def update_nickname(e):
-        set_nickname(e.control.value or "")
-
-    def save_nickname(_):
-        new_nickname = nickname.strip()
-        if new_nickname:
-            state.save_nickname(new_nickname)
-            page.show_dialog(ft.SnackBar(ft.Text(f"닉네임이 저장되었습니다: {new_nickname}")))
-        page.navigate("/profile")
-
-    def log_out(_):
-        state.login_done = 0
-        page.navigate("/log_in")
     
     icons = {
         "루키(1/16)": ft.Icons.EMOJI_EVENTS, "스톤(2/16)": ft.Icons.EMOJI_EVENTS,
